@@ -5,6 +5,7 @@
   "version": "1.0.0",
   "publisher": "Stellar Wolf Entertainment",
   "repository": { "url": "https://github.com/StellarWolfEntertainment/cpp-include-manager" },
+  "icon": ".vscode/icon.png",
   "engines": {
     "vscode": "^1.85.0"
   },
