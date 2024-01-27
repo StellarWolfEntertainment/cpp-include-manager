@@ -2,7 +2,7 @@
   "name": "cpp-include-manager",
   "displayName": "C++ Include Manager",
   "description": "Visual Studio Code extension for managing C++ include paths",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "Stellar Wolf Entertainment",
   "repository": { "url": "https://github.com/StellarWolfEntertainment/cpp-include-manager" },
   "icon": "icon.png",

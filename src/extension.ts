@@ -47,9 +47,12 @@ function handleFileChange()
     }
       const inputJson: IncManJson = JSON.parse(inputData);
 
+      const standardizedLibraries = inputJson['standardized-libraries'] || [];
+      const explicitLibraries = inputJson['explicit-libraries'] || [];
+
       const includePaths = [
-        ...inputJson['standardized-libraries'].map(lib => libraryPathTemplate.replace('${lib}', lib)),
-        ...inputJson['explicit-libraries']
+        ...standardizedLibraries.map(lib => libraryPathTemplate.replace('${lib}', lib)),
+        ...explicitLibraries
       ];
 
       fs.readFile(outputPath, 'utf8', (err, outputData) => {
