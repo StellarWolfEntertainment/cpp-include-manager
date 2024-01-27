@@ -35,45 +35,44 @@ function getPath(filePath : string) : string
 const inputPath = getPath(inputFilePath);
 const outputPath = getPath(outputFilePath);
 
-function handleFileChange()
-{  
+function handleFileChange() {
   let config = vscode.workspace.getConfiguration('cpp-include-manager');
   let libraryPathTemplate: string = config.get('libraryPath') ?? "C:/Libraries/${lib}/include";
 
   fs.readFile(inputPath, 'utf8', (err, inputData) => {
-    if(err)
-    {
+    if (err) {
       vscode.window.showInformationMessage('Error reading IncMan.json');
+      return;
     }
-      const inputJson: IncManJson = JSON.parse(inputData);
 
-      const standardizedLibraries = inputJson['standardized-libraries'] || [];
-      const explicitLibraries = inputJson['explicit-libraries'] || [];
+    const inputJson: IncManJson = JSON.parse(inputData);
+    const standardizedLibraries = inputJson['standardized-libraries'] || [];
+    const explicitLibraries = inputJson['explicit-libraries'] || [];
+    const includePaths = [
+      ...standardizedLibraries.map(lib => libraryPathTemplate.replace('${lib}', lib)),
+      ...explicitLibraries
+    ];
 
-      const includePaths = [
-        ...standardizedLibraries.map(lib => libraryPathTemplate.replace('${lib}', lib)),
-        ...explicitLibraries
-      ];
+    let outputJson: SettingsJson;
 
-      fs.readFile(outputPath, 'utf8', (err, outputData) => {
-        if (err) {
-          vscode.window.showInformationMessage('Error reading settings.json');
-          return;  // Exit early on error
-        }
-        
-        let outputJson: SettingsJson = JSON.parse(outputData);
-        outputJson["C_Cpp.default.includePath"] = includePaths;
-        const updatedData = JSON.stringify(outputJson, null, 2);
+    try {
+      const outputData = fs.readFileSync(outputPath, 'utf8');
+      outputJson = JSON.parse(outputData);
+    } catch (readError) {
+      // Handle read error or initialize an empty object if the file doesn't exist
+      outputJson = {};
+    }
 
-        fs.writeFile(outputPath, updatedData, (err) => {
-          if (err) {
-            vscode.window.showInformationMessage('Error writing settings.json');
-          }
-        });
-      });
+    outputJson["C_Cpp.default.includePath"] = includePaths;
+    const updatedData = JSON.stringify(outputJson, null, 2);
+
+    fs.writeFile(outputPath, updatedData, (err) => {
+      if (err) {
+        vscode.window.showInformationMessage('Error writing settings.json');
+      }
+    });
   });
 }
-
 
 export function activate(context: vscode.ExtensionContext) {
   let watcher = vscode.workspace.createFileSystemWatcher(inputPath);
